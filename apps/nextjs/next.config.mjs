@@ -14,6 +14,11 @@ const config = {
   eslint: {
     ignoreDuringBuilds: !!process.env.CI,
   },
+  env: {
+    // @ts-ignore
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  },
 };
 
 export default config;
