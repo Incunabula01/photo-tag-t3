@@ -19,6 +19,16 @@ const config = {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "dummyimage.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default config;

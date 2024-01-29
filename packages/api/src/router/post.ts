@@ -4,18 +4,18 @@ import { z } from "zod";
 
 import { Storage, SignedPostPolicyV4Output } from "@google-cloud/storage";
 
-const MAX_FILE_SIZE = 1000000; // Number of bytes in a megabyte.
+// const MAX_FILE_SIZE = 1000000; // Number of bytes in a megabyte.
 
-// This is the list of mime types you will accept with the schema
-const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/heic"];
+// // This is the list of mime types you will accept with the schema
+// const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/heic"];
 
-const storage = new Storage({
-  projectId: process.env.PROJECT_ID,
-  credentials: {
-    client_email: process.env.CLIENT_EMAIL,
-    private_key: process.env.PRIVATE_KEY,
-  },
-});
+// const storage = new Storage({
+//   projectId: process.env.PROJECT_ID,
+//   credentials: {
+//     client_email: process.env.CLIENT_EMAIL,
+//     private_key: process.env.PRIVATE_KEY,
+//   },
+// });
 
 export const postRouter = router({
   all: publicProcedure.query(({ ctx }) => {
@@ -24,26 +24,43 @@ export const postRouter = router({
   byId: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.post.findFirst({ where: { id: parseInt(input, 10) } });
   }),
-  uploadBlobToGCS: protectedProcedure
-    .input(z.object({ url: z.string(), file: z.string() }))
+  saveImageToGCS: publicProcedure
+    .input(z.object({ file: z.string(), mimeType: z.string() }))
     .mutation(async ({ input }) => {
-      const { url, file } = input;
+      const { file, mimeType } = input;
 
       try {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await fetch(url, {
-          method: "POST",
-          body: formData,
+        const storage = new Storage({
+          projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+          credentials: {
+            client_email: process.env.NEXT_PUBLIC_CLIENT_EMAIL,
+            private_key: process.env.PRIVATE_KEY,
+          },
         });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        const bucketName = process.env.NEXT_PUBLIC_BUCKET_NAME ?? "";
+        const objectName = `images/${Date.now()}_${Math.random()
+          .toString(36)
+          .substring(2)}`;
 
-        const bucketName = process.env.PROJECT_ID;
-        const objectName = "path/to/your/image.jpg";
+        const [presignedUrl] = await storage
+          .bucket(bucketName)
+          .file(objectName)
+          .getSignedUrl({
+            action: "write",
+            expires: Date.now() + 5 * 60 * 1000, // 5 minutes
+            contentType: mimeType,
+          });
+
+        const decodedFile = Buffer.from(file, "base64");
+
+        await fetch(presignedUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": mimeType,
+          },
+          body: decodedFile,
+        });
 
         const imageUrl = `https://storage.googleapis.com/${bucketName}/${objectName}`;
 
