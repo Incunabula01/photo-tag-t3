@@ -50,10 +50,9 @@ export const postRouter = router({
       z.object({
         title: z.string(),
         content: z.string(),
-        userId: z.number(),
+        userId: z.string(),
         imageUrl: z.string(),
         createdAt: z.coerce.date(),
-        user: z.string(),
       }),
     )
     .mutation(({ ctx, input }) => {
