@@ -133,7 +133,7 @@ importers:
         specifier: ^18.0.38
         version: 18.2.48
       '@types/react-native':
-        specifier: ~0.70.6
+        specifier: ~0.70.19
         version: 0.70.19
       eslint:
         specifier: ^8.28.0
