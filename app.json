@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "ae2e68f7-2986-4014-bde7-1a0066f9467a"
+      }
+    },
+    "android": {
+      "package": "com.jwidener08.phototag"
+    },
+    "ios": {
+      "bundleIdentifier": "com.jwidener08.phototag"
+    }
+  }
+}

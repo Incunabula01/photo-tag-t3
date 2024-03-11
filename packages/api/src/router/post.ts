@@ -1,21 +1,8 @@
 import { router, publicProcedure, protectedProcedure } from "../trpc";
 import { z } from "zod";
-// import { Storage } from "@google-cloud/storage";
 
-import { Storage, SignedPostPolicyV4Output } from "@google-cloud/storage";
-
-// const MAX_FILE_SIZE = 1000000; // Number of bytes in a megabyte.
-
-// // This is the list of mime types you will accept with the schema
-// const ACCEPTED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/heic"];
-
-// const storage = new Storage({
-//   projectId: process.env.PROJECT_ID,
-//   credentials: {
-//     client_email: process.env.CLIENT_EMAIL,
-//     private_key: process.env.PRIVATE_KEY,
-//   },
-// });
+import { storage, ref, uploadBytes, getDownloadURL } from "../../../server";
+// import { storage,  ref,  uploadBytes, getDownloadURL} from '@photo-tag/server';
 
 export const postRouter = router({
   all: publicProcedure.query(({ ctx }) => {
@@ -24,47 +11,35 @@ export const postRouter = router({
   byId: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.post.findFirst({ where: { id: parseInt(input, 10) } });
   }),
-  saveImageToGCS: publicProcedure
-    .input(z.object({ file: z.string(), mimeType: z.string() }))
+  saveImageToFirebase: publicProcedure
+    .input(
+      z.object({
+        file: z.string(),
+      }),
+    )
     .mutation(async ({ input }) => {
-      const { file, mimeType } = input;
+      const { file } = input;
+      const metadata = {
+        contentType: "image/jpg",
+      };
+      console.log("saveImageToFirebase");
 
       try {
-        const storage = new Storage({
-          projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-          credentials: {
-            client_email: process.env.NEXT_PUBLIC_CLIENT_EMAIL,
-            private_key: process.env.PRIVATE_KEY,
-          },
-        });
+        const assetRes = await fetch(file);
+        const assetBlob: Blob = await assetRes.blob();
 
-        const bucketName = process.env.NEXT_PUBLIC_BUCKET_NAME ?? "";
-        const objectName = `images/${Date.now()}_${Math.random()
-          .toString(36)
-          .substring(2)}`;
+        const timestamp = new Date().getTime();
+        const random = Math.floor(Math.random() * 9000) + 1000;
+        const imageId = parseInt(`${timestamp}${random}`, 10);
 
-        const [presignedUrl] = await storage
-          .bucket(bucketName)
-          .file(objectName)
-          .getSignedUrl({
-            action: "write",
-            expires: Date.now() + 5 * 60 * 1000, // 5 minutes
-            contentType: mimeType,
-          });
+        const storageRef = ref(storage, `tag-image-${imageId}.jpg`);
 
-        const decodedFile = Buffer.from(file, "base64");
+        const snapshot = await uploadBytes(storageRef, assetBlob, metadata);
+        console.log("Uploaded a blob or file!", snapshot);
+        const imageUrl = await getDownloadURL(snapshot.ref);
+        console.log("image url", imageUrl);
 
-        await fetch(presignedUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": mimeType,
-          },
-          body: decodedFile,
-        });
-
-        const imageUrl = `https://storage.googleapis.com/${bucketName}/${objectName}`;
-
-        return { success: true, imageUrl };
+        return { success: true, imgUrl: imageUrl };
       } catch (error) {
         console.error("Error:", error);
         return { success: false, error: "Internal Server Error" };
@@ -77,9 +52,13 @@ export const postRouter = router({
         content: z.string(),
         userId: z.number(),
         imageUrl: z.string(),
+        createdAt: z.coerce.date(),
+        user: z.string(),
       }),
     )
     .mutation(({ ctx, input }) => {
+      console.log("create post", input);
+
       return ctx.prisma.post.create({ data: input });
     }),
 });

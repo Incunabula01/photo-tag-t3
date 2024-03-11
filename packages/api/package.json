@@ -10,7 +10,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@google-cloud/storage": "^7.7.0",
     "@trpc/client": "^10.1.0",
     "@trpc/server": "^10.1.0",
     "superjson": "^1.9.1",
