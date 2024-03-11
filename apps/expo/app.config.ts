@@ -1,11 +1,7 @@
 import { ExpoConfig, ConfigContext } from "@expo/config";
 
-// const CLERK_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-// const EAS_APP_ID = process.env.NEXT_PUBLIC_EAS_APP_ID;
-// Temp fix until dev is completed
-const CLERK_PUBLISHABLE_KEY =
-  "pk_test_cG9saXRlLWdydWJ3b3JtLTEwLmNsZXJrLmFjY291bnRzLmRldiQ";
-const EAS_APP_ID = "ae2e68f7-2986-4014-bde7-1a0066f9467a";
+const CLERK_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const EAS_APP_ID = process.env.NEXT_PUBLIC_EAS_APP_ID;
 
 const defineConfig = (_ctx: ConfigContext): ExpoConfig => ({
   name: "photo-tag",
