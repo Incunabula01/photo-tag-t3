@@ -32,16 +32,27 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
         setIsTakingPhoto(true);
 
         try {
-            console.log('picture sizes ==>', await cameraRef.current.getAvailablePictureSizesAsync('4:3'));
+            const imageSizes = await cameraRef.current.getAvailablePictureSizesAsync();
+            console.log('picture sizes ==>', imageSizes);
 
             const { uri } = await cameraRef.current.takePictureAsync();
-
-            setImg(uri);
+            const resizedPhoto = await resizePhoto(uri);
+            setImg(resizedPhoto);
         } catch (error) {
             console.error('Error taking photo:', error);
         } finally {
             setIsTakingPhoto(false);
         }
+    };
+
+    const resizePhoto = async (uri: string) => {
+        const manipResult = await ImageManipulator.manipulateAsync(
+            uri,
+            [{ resize: { width: 800 } }],
+            { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
+        );
+
+        return manipResult.uri;
     };
 
     const saveImage = async () => {
@@ -62,6 +73,14 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
                 setImg(null);
             }
         }
+    }
+
+    const toggleFlash = () => {
+        setFlashMode((prevMode) =>
+            prevMode === FlashMode.off
+                ? FlashMode.on
+                : FlashMode.off
+        );
     }
 
     if (!hasCameraPermissions) {
@@ -94,7 +113,7 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
                         </> :
                         <>
                             <IconButton title={'Take a Photo'} icon="camera" onPress={takePhoto} iconColor='#64748b' />
-                            <IconButton title={'Toggle Flash'} icon="flash" onPress={() => setFlashMode(FlashMode.on)} iconColor='#64748b' />
+                            <IconButton title={'Toggle Flash'} icon="flash" onPress={toggleFlash} iconColor='#64748b' />
                         </>
                     }
 

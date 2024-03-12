@@ -9,7 +9,7 @@ const SignInWithOAuth = () => {
 
   const handleFacebookSignin = useCallback(async () => {
     try {
-      const { createdSessionId, signIn, signUp, setActive } =
+      const { createdSessionId, setActive } =
         await startOAuthFlow();
       if (createdSessionId) {
         setActive?.({ session: createdSessionId });

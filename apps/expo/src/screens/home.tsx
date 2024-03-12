@@ -63,7 +63,6 @@ const CreatePost: React.FC<{ user: string | undefined }> = () => {
     }
   });
 
-  const { uniqueId } = useUniqueId(photoUri);
   const createPost = trpc.post.create.useMutation({
     async onSuccess() {
       setPhotoUri('');
@@ -87,13 +86,13 @@ const CreatePost: React.FC<{ user: string | undefined }> = () => {
     console.log('handle save pressed!');
 
     const todaysDate = new Date();
+    const userName = `${user?.lastName}-${user?.firstName}`;
     createPost.mutate({
       title,
       content,
       imageUrl: photoUri,
-      userId: uniqueId,
+      userId: userName,
       createdAt: todaysDate,
-      user: user?.fullName ?? ""
     });
   }
 

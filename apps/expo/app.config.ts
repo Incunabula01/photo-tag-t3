@@ -1,7 +1,7 @@
 import { ExpoConfig, ConfigContext } from "@expo/config";
 
-const CLERK_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-const EAS_APP_ID = process.env.NEXT_PUBLIC_EAS_APP_ID;
+const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const EAS_APP_ID = process.env.EXPO_PUBLIC_EAS_APP_ID;
 
 const defineConfig = (_ctx: ConfigContext): ExpoConfig => ({
   name: "photo-tag",
@@ -44,6 +44,7 @@ const defineConfig = (_ctx: ConfigContext): ExpoConfig => ({
       },
     ],
   ],
+  scheme: "photo-tag",
 });
 
 export default defineConfig;

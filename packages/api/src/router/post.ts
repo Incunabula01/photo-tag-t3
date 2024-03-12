@@ -11,7 +11,7 @@ export const postRouter = router({
   byId: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.post.findFirst({ where: { id: parseInt(input, 10) } });
   }),
-  saveImageToFirebase: publicProcedure
+  saveImageToFirebase: protectedProcedure
     .input(
       z.object({
         file: z.string(),
@@ -22,7 +22,6 @@ export const postRouter = router({
       const metadata = {
         contentType: "image/jpg",
       };
-      console.log("saveImageToFirebase");
 
       try {
         const assetRes = await fetch(file);

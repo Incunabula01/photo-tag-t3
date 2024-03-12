@@ -14,6 +14,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { transformer } from "@photo-tag/api/transformer";
 import { useAuth } from "@clerk/clerk-expo";
+import * as Network from 'expo-network';
 
 /**
  * A set of typesafe hooks for consuming your API.
@@ -27,12 +28,11 @@ const getBaseUrl = () => {
    * you don't have anything else running on it, or you'd have to change it.
    */
 
-  const localhost = Constants.expoConfig?.hostUri?.split(":")[0] ?? 'localhost';
-  console.log('localhost', localhost);
+  const localhost = Constants.expoConfig?.hostUri?.split(":")[0];
 
   if (!localhost)
     throw new Error("failed to get localhost, configure it manually");
-  return `http://${localhost}:3001`;
+  return `http://${localhost}:3000`;
 };
 
 export const TRPCProvider: React.FC<{
@@ -56,7 +56,7 @@ export const TRPCProvider: React.FC<{
       ],
     }),
   );
-
+  console.log('base url', `${getBaseUrl()}/api/trpc`);
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
