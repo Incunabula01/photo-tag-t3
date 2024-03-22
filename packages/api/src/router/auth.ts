@@ -12,24 +12,21 @@ export const authRouter = router({
         email: z.string().email(),
       }),
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       const { username, email } = input;
-      console.log("add user fired! Auth state:", username, email);
 
       try {
-        const existingUser = ctx.prisma.user.findUnique({
-          where: { email },
-        });
-        console.log("existingUser", existingUser === null);
+        const existingUser = await ctx.prisma.user
+          .findUnique({
+            where: { email },
+          })
+          .then((res) => (res?.username !== undefined ? true : false));
 
-        if (existingUser !== null) {
-          ctx.prisma.user.create({
+        if (!existingUser) {
+          return ctx.prisma.user.create({
             data: { username, email, hasTag: false },
           });
-          console.log("User Created!");
         }
-
-        return { success: true, username };
       } catch (error) {
         console.error("addUser error!", error);
         return { success: false, error };

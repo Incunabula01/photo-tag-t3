@@ -4,6 +4,7 @@ import { Button, View } from "react-native";
 import { useWarmUpBrowser } from "../hooks/useWarmUpBrowser";
 
 const SignInWithOAuth = () => {
+
   useWarmUpBrowser();
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_facebook" });
 
@@ -30,6 +31,7 @@ const SignInWithOAuth = () => {
         title="Sign in with Facebook"
         onPress={handleFacebookSignin}
       />
+
     </View>
   );
 }

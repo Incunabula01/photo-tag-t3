@@ -9,7 +9,7 @@ import type { AppRouter } from "@photo-tag/api";
 
 import { trpc } from "../utils/trpc";
 import CameraComponent from "../components/CameraComponent";
-import { useUniqueId } from "../hooks/useUniqueId";
+
 
 const SignOut = () => {
   const { signOut } = useAuth();
@@ -41,7 +41,7 @@ const PostCard: React.FC<{
   );
 };
 
-const CreatePost: React.FC<{ user: string | undefined }> = () => {
+const CreatePost: React.FC = () => {
   const utils = trpc.useContext();
   const [photoUri, setPhotoUri] = React.useState<string>("");
   const [title, setTitle] = React.useState("");
@@ -96,7 +96,6 @@ const CreatePost: React.FC<{ user: string | undefined }> = () => {
     });
   }
 
-  console.log('create post rendered!');
   if (!showCreate) {
     return (
       <TouchableOpacity
@@ -145,19 +144,13 @@ export const HomeScreen = () => {
   const postQuery = trpc.post.all.useQuery();
   const [showPost, setShowPost] = useState<string | null>(null);
   const { isSignedIn, user } = useUser();
-  const [loggedInUser, setLoggedInUser] = useState<string | undefined>();
 
-  const { mutate } = trpc.auth.addUser.useMutation({
-    onSuccess(data) {
-      if (data.success) {
-        setLoggedInUser(data?.username);
-      }
-      console.log('User Created!');
-    }
-  })
+  const { mutate } = trpc.auth.addUser.useMutation();
 
   useEffect(() => {
     if (isSignedIn) {
+      console.log('logged in!');
+
       const { firstName, lastName, primaryEmailAddress } = user;
 
       mutate({
@@ -206,7 +199,7 @@ export const HomeScreen = () => {
         }
 
         <View>
-          <CreatePost user={loggedInUser} />
+          <CreatePost />
         </View>
 
         <SignOut />
@@ -237,7 +230,5 @@ const styles = StyleSheet.create({
   },
 });
 
-function setLoggedInUser(username: string | undefined) {
-  throw new Error("Function not implemented.");
-}
+
 
