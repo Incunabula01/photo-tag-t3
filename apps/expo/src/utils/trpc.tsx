@@ -14,7 +14,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { transformer } from "@photo-tag/api/transformer";
 import { useAuth } from "@clerk/clerk-expo";
-import * as Network from 'expo-network';
+
 
 /**
  * A set of typesafe hooks for consuming your API.

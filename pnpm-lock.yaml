@@ -80,9 +80,6 @@ importers:
       expo-media-library:
         specifier: ^15.4.1
         version: 15.4.1(expo@49.0.23)
-      expo-network:
-        specifier: ^5.8.0
-        version: 5.8.0(expo@49.0.23)
       expo-random:
         specifier: ^13.1.2
         version: 13.2.0(expo@49.0.23)
@@ -2161,7 +2158,7 @@ packages:
       getenv: 1.0.0
       glob: 7.1.6
       resolve-from: 5.0.0
-      semver: 7.5.3
+      semver: 7.6.0
       slash: 3.0.0
       slugify: 1.6.6
       xcode: 3.0.1
@@ -6442,14 +6439,6 @@ packages:
     dependencies:
       compare-versions: 3.6.0
       invariant: 2.2.4
-    dev: false
-
-  /expo-network@5.8.0(expo@49.0.23):
-    resolution: {integrity: sha512-mTtyqRgLKvXWB+xCoY5WMtRrpVqYmcXWz3YbyN+X0HRGqXg7a+UYOXeKlxrkwBiadsElhmfMeaj1UpmW79Zw/w==}
-    peerDependencies:
-      expo: '*'
-    dependencies:
-      expo: 49.0.23(@babel/core@7.20.5)
     dev: false
 
   /expo-random@13.2.0(expo@49.0.23):

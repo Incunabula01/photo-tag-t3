@@ -1,14 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
 const Explore = () => {
     return (
-        <View>
-            <Text>Explore Screen!</Text>
-        </View>
+        <div>
+            <h1>Explore Screen!</h1>
+        </div>
     )
 }
 
 export default Explore;
 
-const styles = StyleSheet.create({})
