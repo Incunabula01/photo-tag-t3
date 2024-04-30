@@ -26,9 +26,10 @@ const SignInWithOAuth = () => {
   }, []);
 
   return (
-    <View className="rounded-lg border-2 border-gray-500 p-4">
+    <View className="rounded-lg border-2 bg-[#1877F2] p-4">
       <Button
         title="Sign in with Facebook"
+        color="white"
         onPress={handleFacebookSignin}
       />
 

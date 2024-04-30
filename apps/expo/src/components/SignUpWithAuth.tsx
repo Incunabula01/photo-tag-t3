@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSignUp } from "@clerk/clerk-expo";
 import { useState } from "react";
 
@@ -55,6 +55,7 @@ export default function SignUpScreen() {
     };
 
     return (
+        // <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}>
         <View className="flex-1 justify-center items-center">
             {!pendingVerification && (
                 <View className="w-full">
@@ -124,6 +125,8 @@ export default function SignUpScreen() {
                 </View>
             )}
         </View>
+        // </KeyboardAvoidingView>
+
 
     );
 }

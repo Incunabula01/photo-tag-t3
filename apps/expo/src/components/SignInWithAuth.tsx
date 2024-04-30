@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSignIn } from "@clerk/clerk-expo";
 
 export default function SignInScreen() {
@@ -26,6 +26,7 @@ export default function SignInScreen() {
         }
     };
     return (
+        // <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}>
         <View className="flex-1 justify-center items-center">
             <View className="w-full">
                 <Text className="text-3xl font-bold mb-4">Sign In</Text>
@@ -58,5 +59,7 @@ export default function SignInScreen() {
             </View>
 
         </View>
+        // </KeyboardAvoidingView>
+
     );
 }

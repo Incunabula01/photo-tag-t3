@@ -16,6 +16,7 @@ model User {
   username  String   @unique
   email     String   @unique
   hasTag  Boolean
+  capturedTags String[]
   posts    Post[]   @relation("userPosts")
   replies  Reply[]  @relation("userReplies")
 }
@@ -27,6 +28,8 @@ model Post {
   createdAt DateTime @default(now())
   imageUrl String
   userId    String
+  location String
+  postId String
   user      User     @relation("userPosts", fields: [userId], references: [username])
   replies   Reply[]  @relation("postReplies")
 

@@ -11,6 +11,14 @@ export const postRouter = router({
   byId: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.post.findFirst({ where: { id: parseInt(input, 10) } });
   }),
+  mostRecent: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.post.findMany({
+      orderBy: {
+        id: "desc",
+      },
+      take: 1,
+    });
+  }),
   saveImageToFirebase: protectedProcedure
     .input(
       z.object({
@@ -52,6 +60,8 @@ export const postRouter = router({
         userId: z.string(),
         imageUrl: z.string(),
         createdAt: z.coerce.date(),
+        location: z.string(),
+        postId: z.string(),
       }),
     )
     .mutation(({ ctx, input }) => {

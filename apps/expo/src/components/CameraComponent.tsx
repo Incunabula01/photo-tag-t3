@@ -5,18 +5,35 @@ import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import IconButton from './IconButton';
+import { trpc } from '../utils/trpc';
 
 interface CameraComponentProps {
     onSavePhoto: (imgUri: string) => void;
 }
 
 const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
+    const utils = trpc.useContext();
     const [hasCameraPermissions, setHasCameraPermissions] = useState<boolean | null>(null);
     const [flashMode, setFlashMode] = useState<number | FlashMode>(FlashMode.off);
     const cameraRef = useRef<Camera | null>(null);
     const [img, setImg] = useState<string | null>(null);
     const [isTakingPhoto, setIsTakingPhoto] = useState(false);
     console.log('camera component rendered!');
+
+
+    const uploadImage = trpc.post.saveImageToFirebase.useMutation({
+        onError(error) {
+            console.error('saveImage error!', error);
+        },
+        async onSuccess(data) {
+            console.log('on success??', data);
+
+            if (data.success) {
+                onSavePhoto(data.imgUrl ?? "");
+            }
+            await utils.post.all.invalidate();
+        }
+    });
 
     useEffect(() => {
         (async () => {
@@ -66,7 +83,10 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
                     { base64: true }
                 );
                 const base64Img = `data:image/jpg;base64,${resizedPhoto.base64}`;
-                onSavePhoto(base64Img);
+
+                uploadImage.mutate({
+                    file: base64Img,
+                });
             } catch (error) {
                 console.error('Error saving photo:', error);
             } finally {
@@ -92,15 +112,16 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
     }
 
     return (
-        <>
-            <View className='h-full'>
+        <View className='absolute top-0 left-0 z-[9000]'>
+            <View className='flex-1 justify-center items-center w-full h-full'>
+
                 {!img ?
                     <Camera
                         type={CameraType.back}
                         flashMode={flashMode}
                         ref={cameraRef}
                         style={styles.camera}
-                        className='flex justify-between h-[100vh]'
+                        className='flex justify-between h-[80vh] w-full'
                     >
                     </Camera> :
                     <Image source={{ uri: img }} style={styles.camera} />
@@ -119,7 +140,9 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
 
                 </View>
             </View>
-        </>
+
+
+        </View>
 
     );
 };

@@ -10,7 +10,6 @@ import { tokenCache } from "../utils/cache";
 import Constants from "expo-constants";
 
 export const App = () => {
-  console.log('clerk key ===>', Constants.expoConfig?.extra?.clerkPublishableKey);
 
   return (
     <ClerkProvider
