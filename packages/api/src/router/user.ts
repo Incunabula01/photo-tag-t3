@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { protectedProcedure, publicProcedure, router } from "../trpc";
+import { protectedProcedure, router } from "../trpc";
 
 export const userRouter = router({
   addUser: protectedProcedure
@@ -19,9 +19,20 @@ export const userRouter = router({
           })
           .then((res) => (res?.username !== undefined ? true : false));
 
+        const existingPosts = await ctx.prisma.post.findMany();
+
         if (!existingUser) {
           return ctx.prisma.user.create({
-            data: { username, email, hasTag: false, capturedTags: [] },
+            data: {
+              username,
+              email,
+              hasTag: existingPosts.length === 0 ? true : false, //first user capture logic
+              capturedTags: [],
+            },
+          });
+        } else {
+          return ctx.prisma.user.findUnique({
+            where: { email },
           });
         }
       } catch (error) {
@@ -52,43 +63,28 @@ export const userRouter = router({
           })
           .then((res) => res?.username);
 
-        if (user1) {
-          // Checks if user2 exists for first post flow
-          const updateUser1 = await ctx.prisma.user.update({
-            where: {
-              username: user1,
+        const updateUser1 = await ctx.prisma.user.update({
+          where: {
+            username: user1,
+          },
+          data: {
+            hasTag: false,
+          },
+        });
+
+        const updateUser2 = await ctx.prisma.user.update({
+          where: {
+            username: user2,
+          },
+          data: {
+            hasTag: true,
+            capturedTags: {
+              push: capturedId,
             },
-            data: !user2
-              ? {
-                  hasTag: true,
-                  capturedTags: {
-                    push: capturedId,
-                  },
-                }
-              : {
-                  hasTag: false,
-                },
-          });
+          },
+        });
 
-          if (user2) {
-            const updateUser2 = await ctx.prisma.user.update({
-              where: {
-                username: user2,
-              },
-              data: {
-                hasTag: true,
-                capturedTags: {
-                  push: capturedId,
-                },
-              },
-            });
-            return { updateUser1, updateUser2 };
-          }
-
-          return { updateUser1 };
-        }
-
-        return null;
+        return { updateUser1, updateUser2 };
       } catch (error) {
         console.error("updateUsers error!", error);
         return { error };

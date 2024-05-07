@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Button, Text, TextInput, TouchableOpacity, View, StyleSheet, Image, Alert } from "react-native";
+import { Button, Text, TextInput, TouchableOpacity, View, StyleSheet, Image, Alert, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform } from "react-native";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
@@ -11,7 +11,13 @@ import uuid from 'react-native-uuid';
 
 import { trpc } from "../utils/trpc";
 import CameraComponent from "../components/CameraComponent";
-import { Post } from "../../../../packages/db";
+import { Post, User } from "../../../../packages/db";
+import Modal from "../components/Modal";
+import { ModalProvider, useModal } from "../components/ModalProvider";
+import IconButton from "../components/IconButton";
+import FullScreenLoader from "../components/Loading";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useUserStore, useAppStore } from "../store/GlobalStore";
 
 
 const SignOut = () => {
@@ -47,24 +53,214 @@ const PostCard: React.FC<{
 
 interface CreatePostProps {
   userId: string | undefined;
-  postCoord?: string | undefined;
   userCoord: Location.LocationObjectCoords | null;
-  captureTitle: string;
   hasPost: boolean;
-  photoUri: string;
-  onCapture: (cameraState: boolean) => void;
+  onNewPost: () => void;
 }
 
-const CreatePost = ({ userId, userCoord, postCoord, captureTitle, hasPost, photoUri = '', onCapture }: CreatePostProps) => {
+const CreatePost = ({
+  userId,
+  userCoord,
+  hasPost,
+  onNewPost
+}: CreatePostProps) => {
+  const { user } = useUser();
+  const { currentUser, setCurrentUser } = useUserStore();
+  const { status } = useAppStore();
   const utils = trpc.useContext();
   const [title, setTitle] = React.useState("");
   const [content, setContent] = React.useState("");
-  const [showCreate, setShowCreate] = useState<boolean>(false);
+  const [photoUrl, setPhotoUri] = useState<string>("");
 
-  const [userUpdated, setUserUpdated] = useState<boolean>(false);
-  const { user } = useUser();
+
+  const { closeModal } = useModal();
+
+  const updateUsers = trpc.user.updateUsers.useMutation({
+    onError(error) {
+      console.error('saveImage error!', error);
+    },
+    async onSuccess(data) {
+      if (data?.updateUser2) {
+        setCurrentUser({ ...currentUser, hasTag: data?.updateUser2.hasTag });
+      }
+      await utils.post.all.invalidate();
+    }
+  });
+
+  const createNewTag = trpc.post.create.useMutation({
+    async onSuccess() {
+      setTitle('');
+      setContent('');
+      closeModal();
+      onNewPost();
+      await utils.post.all.invalidate();
+    },
+  });
+
+  const handlePhotoSave = (imgUri: string) => {
+    setPhotoUri(imgUri);
+  };
+
+  const handleCreatePost = () => {
+
+    const capturedId = `tag-${uuid.v4()}`;
+
+    if (hasPost && status === 'placed') {
+      updateUsers.mutate({
+        prevName: userId ?? '',
+        nextName: `${user?.lastName}-${user?.firstName}`,
+        capturedId: capturedId
+      });
+    }
+
+    const todaysDate = new Date();
+    const userName = `${user?.lastName}-${user?.firstName}`;
+
+    createNewTag.mutate({
+      title,
+      content,
+      imageUrl: photoUrl,
+      userId: userName,
+      createdAt: todaysDate,
+      location: JSON.stringify({
+        lat: userCoord?.latitude,
+        long: userCoord?.longitude
+      }),
+      postId: `tag-${uuid.v4()}`
+    });
+
+  };
+
+  return (
+    <>
+      <View className="flex flex-col p-4 gap-2">
+        {photoUrl &&
+
+          <KeyboardAwareScrollView>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <>
+                <View className="h-[60vh] w-[100vw] relative">
+                  <View className="absolute top-1 left-1 z-10">
+                    <IconButton
+                      onPress={closeModal}
+                      icon="cross"
+                      iconSize={36}
+                    />
+                  </View>
+
+                  <Image source={{ uri: photoUrl }} className="flex-1" />
+                </View>
+                <View className="p-2">
+                  <TextInput
+                    className="mb-2 rounded border-2 border-gray-500 p-2 text-slate-500"
+                    onChangeText={(value) => setTitle(value)}
+                    placeholder="Title"
+                  />
+                  <TextInput
+                    className="mb-2 rounded border-2 border-gray-500 p-2 text-slate-500"
+                    multiline={true}
+                    onChangeText={(value) => setContent(value)}
+                    placeholder="Content"
+                  />
+                  <TouchableOpacity
+                    className="rounded bg-slate-500 p-2"
+                    onPress={handleCreatePost}
+                  >
+                    <Text className="font-semibold text-white">Create Tag</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+
+            </TouchableWithoutFeedback>
+          </KeyboardAwareScrollView>
+
+        }
+      </View>
+
+      {!photoUrl &&
+        <View className="flex flex-1 w-[100vw] h-full relative overflow-hidden">
+          <View className="absolute top-1 left-1 z-10">
+            <IconButton
+              onPress={closeModal}
+              icon="cross"
+              iconSize={36}
+            />
+          </View>
+          <CameraComponent onSavePhoto={handlePhotoSave} />
+        </View>
+      }
+    </>
+  );
+};
+
+export const HomeScreen = () => {
+  // const postQuery = trpc.post.all.useQuery();
+  const { openModal, closeModal } = useModal();
+  const { currentUser, setCurrentUser } = useUserStore();
+  const { status, setStatus } = useAppStore();
+  const utils = trpc.useContext();
+  const { data, refetch } = trpc.post.mostRecent.useQuery();
+  // const [showPost, setShowPost] = useState<string | undefined>();
+  const { isSignedIn, user } = useUser();
+
+
+  const addUser = trpc.user.addUser.useMutation({
+    onError(error) {
+      console.log('User Cant Be Updated!', error);
+
+    },
+    async onSuccess(userData) {
+      if (userData) {
+        const { id, username, email, hasTag, capturedTags } = userData as User;
+
+        setCurrentUser({
+          id, username, email, hasTag, capturedTags
+        });
+        await utils.user.invalidate();
+      }
+    }
+  });
+  console.log("USER STORE ==>", currentUser.username, currentUser.hasTag);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      console.log('logged in!');
+      // Adds user if signed up
+      const { firstName, lastName, primaryEmailAddress } = user;
+
+      addUser.mutate({
+        username: `${lastName}-${firstName}` ?? "",
+        email: primaryEmailAddress?.emailAddress ?? ""
+      });
+    }
+
+  }, [isSignedIn, user]);
+
+  const getLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status === 'granted') {
+      const { coords } = await Location.getCurrentPositionAsync();
+      console.log('zee coordz', coords);
+      return coords;
+    } else {
+      Alert.alert('Location required', 'You can not post unless location access is enabled!', [{
+        text: 'Cancel',
+        style: 'cancel'
+      }, {
+        text: 'Accept',
+        onPress: async () => {
+          await Location.requestForegroundPermissionsAsync();
+        }
+      }])
+    }
+  }
 
   const isWithinRadius = (coord1: { lat: number; long: number }, coord2: { lat: number; long: number }): boolean => {
+    const toRadians = (degrees: number): number => {
+      return degrees * Math.PI / 180;
+    };
+
     const earthRadius = 6371000; // Earth's radius in meters
     const lat1 = toRadians(coord1.lat);
     const lat2 = toRadians(coord2.lat);
@@ -80,260 +276,150 @@ const CreatePost = ({ userId, userCoord, postCoord, captureTitle, hasPost, photo
     return distance <= 100; // Check if distance is within 100 meters
   };
 
-  const toRadians = (degrees: number): number => {
-    return degrees * Math.PI / 180;
-  };
+  const handleCapture = async () => {
+    openModal(<FullScreenLoader />, false);
 
+    const userLocation: Location.LocationObjectCoords | undefined = await getLocation();
 
-  const updateUsers = trpc.user.updateUsers.useMutation({
-    onError(error) {
-      console.error('saveImage error!', error);
-    },
-    async onSuccess(data) {
-      if (data?.updateUser2) {
-        setUserUpdated(true);
-      }
-      await utils.post.all.invalidate();
-    }
-  });
+    if (userLocation) {
+      if (data && data.length > 0) {
+        const coord1 = { lat: userLocation?.latitude, long: userLocation?.longitude };
+        const coord2 = JSON.parse(data[0]?.location ?? '');
 
+        if (currentUser.hasTag) {
+          openModal(
+            <CreatePost
+              userId={currentUser.username}
+              userCoord={userLocation}
+              hasPost={true}
+              onNewPost={() => {
+                refetch({
+                  throwOnError: true
+                });
+                setStatus('placed');
+              }}
+            />,
+            true
+          );
+          console.log('App Status', status);
 
-
-  const createPost = trpc.post.create.useMutation({
-    async onSuccess() {
-      setTitle('');
-      setContent('');
-      setShowCreate(false);
-      await utils.post.all.invalidate();
-    },
-  });
-
-  const handleCapture = () => {
-    // Todo, deal with first capture logic
-    const capturedId = `tag-${uuid.v4()}`;
-
-    let input = {
-      prevName: userId ?? '',
-      nextName: `${user?.lastName}-${user?.firstName}`,
-      capturedId
-    }
-    if (!hasPost) {
-      input = {
-        prevName: `${user?.lastName}-${user?.firstName}`,
-        nextName: '',
-        capturedId
-      }
-    }
-
-    if (userId !== `${user?.lastName}-${user?.firstName}` && userCoord?.latitude && userCoord?.longitude && postCoord) {
-      const coord1 = { lat: userCoord?.latitude, long: userCoord?.longitude };
-      const coord2 = JSON.parse(postCoord ?? '');
-      console.log('user coord', coord1);
-      console.log('is in radius?', isWithinRadius(coord1, coord2));
-      if (isWithinRadius(coord1, coord2)) {
-        updateUsers.mutate(input);
-        onCapture(true);
-      } else {
-        // Todo: add modals
-        Alert.alert('Oops!', 'Nowhere close to tag, please try again!');
-      }
-    }
-  }
-
-  const handleSave = () => {
-    console.log('handle save pressed!');
-
-    const todaysDate = new Date();
-    const userName = `${user?.lastName}-${user?.firstName}`;
-    createPost.mutate({
-      title,
-      content,
-      imageUrl: photoUri,
-      userId: userName,
-      createdAt: todaysDate,
-      location: JSON.stringify({
-        lat: userCoord?.latitude,
-        long: userCoord?.longitude
-      }),
-      postId: `tag-${uuid.v4()}`
-    });
-  }
-
-  return (
-    <View className="flex flex-col border-t-2 border-gray-500 p-4 gap-2">
-      <TouchableOpacity
-        className="rounded bg-green-500 p-4"
-        onPress={handleCapture}
-      >
-        <Text className="font-semibold text-white text-center">{captureTitle}</Text>
-      </TouchableOpacity>
-
-      {photoUri &&
-        <>
-          <View className="h-[50vh]">
-            <Image source={{ uri: photoUri }} className="flex-1" />
-          </View>
-
-          <TextInput
-            className="mb-2 rounded border-2 border-gray-500 p-2 text-slate-500"
-            onChangeText={(value) => setTitle(value)}
-            placeholder="Title"
-          />
-          <TextInput
-            className="mb-2 rounded border-2 border-gray-500 p-2 text-slate-500"
-            onChangeText={(value) => setContent(value)}
-            placeholder="Content"
-          />
-          <TouchableOpacity
-            className="rounded bg-slate-500 p-2"
-            onPress={handleSave}
-          >
-            <Text className="font-semibold text-white">Publish post</Text>
-          </TouchableOpacity>
-        </>
-      }
-
-    </View>
-
-  );
-};
-
-export const HomeScreen = () => {
-  // const postQuery = trpc.post.all.useQuery();
-  const mostRecentPostQuery = trpc.post.mostRecent.useQuery();
-  const [showPost, setShowPost] = useState<string | undefined>();
-  const { isSignedIn, user } = useUser();
-  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
-  const { mutate } = trpc.user.addUser.useMutation();
-  const [showCamera, setShowCamera] = useState<boolean>(false);
-  const [photoUrl, setPhotoUri] = useState<string>("");
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === 'granted') {
-        const { coords } = await Location.getCurrentPositionAsync();
-        if (coords) {
-          setLocation(coords);
-          console.log('zee coordz', coords);
-
+        } else if (isWithinRadius(coord1, coord2)) {
+          setStatus('found');
+          closeModal();
+          openModal(
+            <CreatePost
+              userId={data[0]?.userId}
+              userCoord={userLocation}
+              hasPost={true}
+              onNewPost={() => {
+                refetch({
+                  throwOnError: true
+                });
+                setStatus('pending');
+              }}
+            />,
+            true
+          );
+          console.log('App Status', status);
+        } else {
+          closeModal();
+          Alert.alert('Oops!', 'Nowhere close to tag, please try again!');
         }
       } else {
-        Alert.alert('Location required', 'You can not post unless location access is enabled!', [{
-          text: 'Cancel',
-          onPress: () => {
-            setLocation(null);
-          },
-          style: 'cancel'
-        }, {
-          text: 'Accept',
-          onPress: async () => {
-            await Location.requestForegroundPermissionsAsync();
-          }
-        }])
+        closeModal();
+        openModal(
+          <CreatePost
+            userId={`${user?.lastName}-${user?.firstName}`}
+            userCoord={userLocation}
+            hasPost={false}
+            onNewPost={() => {
+              refetch({
+                throwOnError: true
+              });
+              setStatus('placed');
+            }}
+          />,
+          true
+        );
+        console.log('App Status', status);
       }
-    })();
 
-    if (isSignedIn) {
-      console.log('logged in!');
-      // Adds user if signed up
-      const { firstName, lastName, primaryEmailAddress } = user;
+    } else {
 
-      mutate({
-        username: `${lastName}-${firstName}` ?? "",
-        email: primaryEmailAddress?.emailAddress ?? ""
-      });
+      Alert.alert('Location required', 'You can not post unless location access is enabled!', [{
+        text: 'Cancel',
+        style: 'cancel'
+      }, {
+        text: 'Accept',
+        onPress: async () => {
+          await Location.requestForegroundPermissionsAsync();
+        }
+      }]);
     }
-
-  }, [isSignedIn, user]);
-
-
-  console.log('most recent', mostRecentPostQuery);
-
-  const handlePhotoSave = (imgUri: string) => {
-    setPhotoUri(imgUri);
-    setShowCamera(false);
   }
 
   return (
     <SafeAreaView className="bg-white" style={styles.container}>
-      <View className="h-full w-full p-2" style={styles.main}>
-        <Text className="mx-auto pb-2 text-5xl font-bold text-gray-500">
-          Photo Tag
-        </Text>
+      <ModalProvider >
+        <View className="h-full w-full p-2" style={styles.main}>
+          <Text className="mx-auto pb-2 text-5xl font-bold text-gray-500">
+            Photo Tag
+          </Text>
 
+          {data && data.length > 0 &&
 
-        {mostRecentPostQuery.data && mostRecentPostQuery.data.length > 0 ?
-          <>
-            <TouchableOpacity onPress={() => setShowPost(mostRecentPostQuery.data[0]?.id.toString())}>
-              <PostCard post={mostRecentPostQuery.data[0] as Post} />
-            </TouchableOpacity>
-            <View>
-              <CreatePost
-                userId={mostRecentPostQuery.data[0]?.userId}
-                postCoord={mostRecentPostQuery.data[0]?.location}
-                userCoord={location}
-                captureTitle={"Capture tag!"}
-                hasPost={true}
-                onCapture={(cameraState) => setShowCamera(cameraState)}
-                photoUri=""
-              />
-            </View>
-          </> :
-          <View className="py-2">
-            <Text className="font-semibold italic text-gray-500">
-              No Posts Yet, create some!
-            </Text>
-            <View>
-              <CreatePost
-                userId={`${user?.lastName}-${user?.firstName}`}
-                userCoord={location}
-                captureTitle={"Create New Tag!"}
-                hasPost={false}
-                photoUri={photoUrl}
-                onCapture={(cameraState) => setShowCamera(cameraState)}
-              />
-            </View>
-          </View>
+            <>
+              <PostCard post={data[0] as Post} />
+              <View className="py-2">
+                {(!currentUser.hasTag && status === 'placed') &&
+                  <TouchableOpacity
+                    className="rounded bg-green-500 p-4"
+                    onPress={handleCapture}
+                  >
+                    <Text className="font-semibold text-white text-center">Capture Tag!</Text>
+                  </TouchableOpacity>
+                }
+                {currentUser.hasTag && status === 'pending' &&
+                  <TouchableOpacity
+                    className="rounded bg-green-500 p-4"
+                    onPress={handleCapture}
+                  >
+                    <Text className="font-semibold text-white text-center">Place New Tag!</Text>
+                  </TouchableOpacity>
+                }
+              </View>
+            </>
+          }
 
+          {data && data.length === 0 &&
+            <>
+              <Text className="font-semibold italic text-gray-500">
+                No Posts Yet, create some!
+              </Text>
+              <View className="py-2">
+                <TouchableOpacity
+                  className="rounded bg-green-500 p-4"
+                  onPress={handleCapture}
+                >
+                  <Text className="font-semibold text-white text-center">Create New Tag!</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          }
 
-        }
-        {/* {postQuery.data ?
-          <FlashList
-            data={postQuery.data}
-            estimatedItemSize={1}
-            ItemSeparatorComponent={() => <View className="h-2" />}
-            renderItem={(p) => (
-              <TouchableOpacity onPress={() => setShowPost(p.item.id.toString())}>
-                <PostCard post={p.item} />
-              </TouchableOpacity>
-            )}
-          /> :
-          <View className="py-2">
-            <Text className="font-semibold italic text-gray-500">
-              No Posts Yet, create some!
-            </Text>
-          </View>
-        } */}
-
-
-
-        <SignOut />
-      </View>
-      {showCamera &&
-        <View className='relative'>
-          <CameraComponent onSavePhoto={handlePhotoSave} />
+          <SignOut />
         </View>
-      }
+      </ModalProvider>
+
     </SafeAreaView>
   );
-};
+
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "flex-start",
-    // padding: 24,
   },
   main: {
     flex: 1,

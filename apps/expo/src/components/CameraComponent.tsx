@@ -49,11 +49,12 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
         setIsTakingPhoto(true);
 
         try {
-            const imageSizes = await cameraRef.current.getAvailablePictureSizesAsync();
-            console.log('picture sizes ==>', imageSizes);
+            // const imageSizes = await cameraRef.current.getAvailablePictureSizesAsync();
+            // console.log('picture sizes ==>', imageSizes);
 
             const { uri } = await cameraRef.current.takePictureAsync();
             const resizedPhoto = await resizePhoto(uri);
+            console.log('picture resize ==>', resizedPhoto);
             setImg(resizedPhoto);
         } catch (error) {
             console.error('Error taking photo:', error);
@@ -76,12 +77,14 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
         if (img) {
             try {
                 const { uri, width } = await MediaLibrary.createAssetAsync(img);
+
                 MediaLibrary.saveToLibraryAsync(uri);
                 const resizedPhoto = await ImageManipulator.manipulateAsync(
                     uri,
                     [{ resize: { width: width / 2 } }],
                     { base64: true }
                 );
+
                 const base64Img = `data:image/jpg;base64,${resizedPhoto.base64}`;
 
                 uploadImage.mutate({
@@ -112,45 +115,39 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
     }
 
     return (
-        <View className='absolute top-0 left-0 z-[9000]'>
-            <View className='flex-1 justify-center items-center w-full h-full'>
-
-                {!img ?
-                    <Camera
-                        type={CameraType.back}
-                        flashMode={flashMode}
-                        ref={cameraRef}
-                        style={styles.camera}
-                        className='flex justify-between h-[80vh] w-full'
-                    >
-                    </Camera> :
-                    <Image source={{ uri: img }} style={styles.camera} />
+        <View className='flex flex-1 justify-center items-center'>
+            {!img ?
+                <Camera
+                    type={CameraType.back}
+                    flashMode={flashMode}
+                    ref={cameraRef}
+                    // style={styles.camera}
+                    // className='flex justify-between h-[80vh] w-full'
+                    className='flex-1 h-[100vh] w-full justify-between'
+                >
+                </Camera> :
+                <Image source={{ uri: img }} className='flex-1 h-[100vh] w-full justify-between' />
+            }
+            <View className="flex flex-row justify-between h-16">
+                {img ?
+                    <>
+                        <IconButton title={'Retake Photo'} icon="camera" onPress={() => setImg(null)} iconColor='#64748b' />
+                        <IconButton title={'Save Photo'} icon="check" onPress={saveImage} iconColor='#64748b' />
+                    </> :
+                    <>
+                        <IconButton title={'Take a Photo'} icon="camera" onPress={takePhoto} iconColor='#64748b' />
+                        <IconButton title={'Toggle Flash'} icon="flash" onPress={toggleFlash} iconColor='#64748b' />
+                    </>
                 }
-                <View className="flex flex-row justify-between h-24">
-                    {img ?
-                        <>
-                            <IconButton title={'Retake Photo'} icon="camera" onPress={() => setImg(null)} iconColor='#64748b' />
-                            <IconButton title={'Save Photo'} icon="check" onPress={saveImage} iconColor='#64748b' />
-                        </> :
-                        <>
-                            <IconButton title={'Take a Photo'} icon="camera" onPress={takePhoto} iconColor='#64748b' />
-                            <IconButton title={'Toggle Flash'} icon="flash" onPress={toggleFlash} iconColor='#64748b' />
-                        </>
-                    }
 
-                </View>
             </View>
-
-
         </View>
-
     );
 };
 
 const styles = StyleSheet.create({
     camera: {
         flex: 1,
-        borderRadius: 20
     }
 })
 
