@@ -1,500 +1,500 @@
-import { Icon, IconName } from "@/components/icon";
-import { makeIcon, TabBarIcon } from "@/components/tab-bar-icon";
-import { TabbedNavigator } from "@/components/tab-slot";
-import cssStyles from "@/styles/root-layout.module.scss";
-import { Pressable, StyleSheet } from "@bacons/react-views";
-import { Href, Link } from "expo-router";
-import React, { ReactElement, ReactNode, useRef, useState } from "react";
-import {
-  Animated,
-  Easing,
-  Platform,
-  Text,
-  TouchableWithoutFeedback,
-  useWindowDimensions,
-  View,
-  ViewStyle,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+// import { Icon, IconName } from "@/components/icon";
+// import { makeIcon, TabBarIcon } from "@/components/tab-bar-icon";
+// import { TabbedNavigator } from "@/components/tab-slot";
+// import cssStyles from "@/styles/root-layout.module.scss";
+// import { Pressable, StyleSheet } from "@bacons/react-views";
+// import { Href, Link } from "expo-router";
+// import React, { ReactElement, ReactNode, useRef, useState } from "react";
+// import {
+//   Animated,
+//   Easing,
+//   Platform,
+//   Text,
+//   TouchableWithoutFeedback,
+//   useWindowDimensions,
+//   View,
+//   ViewStyle,
+// } from "react-native";
+// import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const cns = (
-  ...classes: (string | false | undefined | null)[]
-): Record<string, any> => ({
-  $$css: true,
-  _: classes.filter(Boolean).join(" ") as unknown as string[],
-});
+// const cns = (
+//   ...classes: (string | false | undefined | null)[]
+// ): Record<string, any> => ({
+//   $$css: true,
+//   _: classes.filter(Boolean).join(" ") as unknown as string[],
+// });
 
-function HeaderLogo() {
-  const isLargeHorizontal = useWidth(1264);
-  const isSmallHorizontal = useWidth(768);
+// function HeaderLogo() {
+//   const isLargeHorizontal = useWidth(1264);
+//   const isSmallHorizontal = useWidth(768);
 
-  return (
-    <Link
-      style={[
-        { paddingVertical: 20, alignItems: "flex-start" },
-        Platform.select({
-          default: isSmallHorizontal &&
-            !isLargeHorizontal && {
-            paddingTop: 0,
-            minHeight: 96,
-            marginTop: 12,
-            paddingBottom: 23,
-            height: 96,
-          },
-          web: cns(cssStyles.headerLink),
-        }),
-      ]}
-      href="/"
-      asChild
-    >
-      <Pressable>
-        {({ hovered }) => (
-          <Text
-            style={[
-              jsStyles.headerLogo,
-              {
-                backgroundColor: hovered ? "rgba(0, 0, 0, 0.1)" : "transparent",
-              },
-            ]}
-          >
-            <Icon
-              style={Platform.select({
-                default: !isLargeHorizontal && { display: "none" },
-                web: cns(cssStyles.wideVisible),
-              })}
-              name="logo"
-              fill={Colors.dark}
-            />
-            <Icon
-              style={Platform.select({
-                default: isLargeHorizontal && { display: "none" },
-                web: cns(cssStyles.wideHidden),
-              })}
-              name="logo-small"
-              fill={Colors.dark}
-            />
-          </Text>
-        )}
-      </Pressable>
-    </Link>
-  );
-}
+//   return (
+//     <Link
+//       style={[
+//         { paddingVertical: 20, alignItems: "flex-start" },
+//         Platform.select({
+//           default: isSmallHorizontal &&
+//             !isLargeHorizontal && {
+//             paddingTop: 0,
+//             minHeight: 96,
+//             marginTop: 12,
+//             paddingBottom: 23,
+//             height: 96,
+//           },
+//           web: cns(cssStyles.headerLink),
+//         }),
+//       ]}
+//       href="/"
+//       asChild
+//     >
+//       <Pressable>
+//         {({ hovered }) => (
+//           <Text
+//             style={[
+//               jsStyles.headerLogo,
+//               {
+//                 backgroundColor: hovered ? "rgba(0, 0, 0, 0.1)" : "transparent",
+//               },
+//             ]}
+//           >
+//             <Icon
+//               style={Platform.select({
+//                 default: !isLargeHorizontal && { display: "none" },
+//                 web: cns(cssStyles.wideVisible),
+//               })}
+//               name="logo"
+//               fill={Colors.dark}
+//             />
+//             <Icon
+//               style={Platform.select({
+//                 default: isLargeHorizontal && { display: "none" },
+//                 web: cns(cssStyles.wideHidden),
+//               })}
+//               name="logo-small"
+//               fill={Colors.dark}
+//             />
+//           </Text>
+//         )}
+//       </Pressable>
+//     </Link>
+//   );
+// }
 
-function useWidth(size) {
-  if (typeof window === "undefined") {
-    return true;
-  }
-  const { width } = useWindowDimensions();
-  if (Platform.OS === "ios" || Platform.OS === "android") {
-    return false;
-  }
-  return width >= size;
-}
+// function useWidth(size) {
+//   if (typeof window === "undefined") {
+//     return true;
+//   }
+//   const { width } = useWindowDimensions();
+//   if (Platform.OS === "ios" || Platform.OS === "android") {
+//     return false;
+//   }
+//   return width >= size;
+// }
 
-function SideBar({ visible }) {
-  const isLarge = useWidth(1265);
+// function SideBar({ visible }) {
+//   const isLarge = useWidth(1265);
 
-  return (
-    <View
-      style={[
-        jsStyles.sideBar,
+//   return (
+//     <View
+//       style={[
+//         jsStyles.sideBar,
 
-        ...Platform.select({
-          default: [
-            !visible && {
-              display: "none",
-            },
-            isLarge && {
-              minWidth: NAV_MEDIUM_WIDTH,
-            },
-          ],
+//         ...Platform.select({
+//           default: [
+//             !visible && {
+//               display: "none",
+//             },
+//             isLarge && {
+//               minWidth: NAV_MEDIUM_WIDTH,
+//             },
+//           ],
 
-          web: [cns(cssStyles.largeVisible, cssStyles.sideBar)],
-        }),
-      ]}
-    >
-      <View
-        style={[
-          jsStyles.sidebarInner,
-          ...Platform.select({
-            default: [
-              isLarge &&
-              ({
-                width: NAV_MEDIUM_WIDTH,
-                minWidth: NAV_MEDIUM_WIDTH,
-                alignItems: "flex-start",
-              } as const),
-            ],
-            web: [cns(cssStyles.sideBarInner)],
-          }),
-        ]}
-      >
-        <View
-          style={[
-            jsStyles.sidebarInner2,
-            Platform.select({
-              default: !isLarge && {
-                alignItems: "center",
-              },
-              web: cns(cssStyles.sideBarHeader),
-            }),
-            {
-              zIndex: 3
-            }
-          ]}
-        >
-          <HeaderLogo />
+//           web: [cns(cssStyles.largeVisible, cssStyles.sideBar)],
+//         }),
+//       ]}
+//     >
+//       <View
+//         style={[
+//           jsStyles.sidebarInner,
+//           ...Platform.select({
+//             default: [
+//               isLarge &&
+//               ({
+//                 width: NAV_MEDIUM_WIDTH,
+//                 minWidth: NAV_MEDIUM_WIDTH,
+//                 alignItems: "flex-start",
+//               } as const),
+//             ],
+//             web: [cns(cssStyles.sideBarInner)],
+//           }),
+//         ]}
+//       >
+//         <View
+//           style={[
+//             jsStyles.sidebarInner2,
+//             Platform.select({
+//               default: !isLarge && {
+//                 alignItems: "center",
+//               },
+//               web: cns(cssStyles.sideBarHeader),
+//             }),
+//             {
+//               zIndex: 3
+//             }
+//           ]}
+//         >
+//           <HeaderLogo />
 
-          <View style={{ gap: 4, flex: 1 }}>
-            <SideBarTabItem name="/index" icon={makeIcon("home")}>
-              Home
-            </SideBarTabItem>
-            <SideBarTabItem name="/explore" icon={makeIcon("explore")}>
-              Explore
-            </SideBarTabItem>
-            {/* Divider */}
-          </View>
-          <View>
-            <SideBarTabItem name="/more" icon={makeIcon("more")}>
-              More
-            </SideBarTabItem>
-          </View>
-        </View>
-      </View>
-    </View>
-  );
-}
+//           <View style={{ gap: 4, flex: 1 }}>
+//             <SideBarTabItem name="/index" icon={makeIcon("home")}>
+//               Home
+//             </SideBarTabItem>
+//             <SideBarTabItem name="/explore" icon={makeIcon("explore")}>
+//               Explore
+//             </SideBarTabItem>
+//             {/* Divider */}
+//           </View>
+//           <View>
+//             <SideBarTabItem name="/more" icon={makeIcon("more")}>
+//               More
+//             </SideBarTabItem>
+//           </View>
+//         </View>
+//       </View>
+//     </View>
+//   );
+// }
 
-function TabBar({ visible }) {
-  return (
-    <View
-      style={[
-        {
-          paddingBottom: useSafeAreaInsets().bottom,
-        },
-        Platform.select({
-          default: {
-            display: visible ? "flex" : "none",
-          },
-          web: cns(cssStyles.smallVisible),
-        }),
-      ]}
-    >
-      <View style={jsStyles.nav}>
-        {[
-          { name: 'index', id: "index", icon: "home" },
-          { name: 'explore', id: "explore", icon: "explore" },
-          { name: '/more', id: "more", icon: "more" },
-        ].map((tab, i) => (
-          <TabBarItem key={i} name={tab.name as Href<string>} id={tab.id}>
-            {({ focused, pressed }) => (
-              <TabBarIcon
-                color="black"
-                style={[
-                  {
-                    paddingHorizontal: 8,
-                  },
-                  pressed && {
-                    transform: [{ scale: 0.9 }],
-                    opacity: 0.8,
-                  },
-                ]}
-                name={tab.icon as IconName}
-                focused={focused}
-              />
-            )}
-          </TabBarItem>
-        ))}
-      </View>
-    </View>
-  );
-}
+// function TabBar({ visible }) {
+//   return (
+//     <View
+//       style={[
+//         {
+//           paddingBottom: useSafeAreaInsets().bottom,
+//         },
+//         Platform.select({
+//           default: {
+//             display: visible ? "flex" : "none",
+//           },
+//           web: cns(cssStyles.smallVisible),
+//         }),
+//       ]}
+//     >
+//       <View style={jsStyles.nav}>
+//         {[
+//           { name: 'index', id: "index", icon: "home" },
+//           { name: 'explore', id: "explore", icon: "explore" },
+//           { name: '/more', id: "more", icon: "more" },
+//         ].map((tab, i) => (
+//           <TabBarItem key={i} name={tab.name as Href<string>} id={tab.id}>
+//             {({ focused, pressed }) => (
+//               <TabBarIcon
+//                 color="black"
+//                 style={[
+//                   {
+//                     paddingHorizontal: 8,
+//                   },
+//                   pressed && {
+//                     transform: [{ scale: 0.9 }],
+//                     opacity: 0.8,
+//                   },
+//                 ]}
+//                 name={tab.icon as IconName}
+//                 focused={focused}
+//               />
+//             )}
+//           </TabBarItem>
+//         ))}
+//       </View>
+//     </View>
+//   );
+// }
 
-function useIsTabSelected(name: string): boolean {
-  const { navigation } = TabbedNavigator.useContext();
+// function useIsTabSelected(name: string): boolean {
+//   const { navigation } = TabbedNavigator.useContext();
 
-  const state = navigation.getState();
-  const current = state.routes.find((route, i) => state.index === i);
+//   const state = navigation.getState();
+//   const current = state.routes.find((route, i) => state.index === i);
 
-  return current?.name === name;
-}
+//   return current?.name === name;
+// }
 
-function TabBarItem({
-  children,
-  name,
-  style,
-  id
-}: {
-  children?: any;
-  name: Href<string>;
-  style?: ViewStyle;
-  id: string;
-}) {
-  const focused = useIsTabSelected(id);
-  const nameString = name.toString();
+// function TabBarItem({
+//   children,
+//   name,
+//   style,
+//   id
+// }: {
+//   children?: any;
+//   name: Href<string>;
+//   style?: ViewStyle;
+//   id: string;
+// }) {
+//   const focused = useIsTabSelected(id);
+//   const nameString = name.toString();
 
-  if (nameString.startsWith("/") || nameString.startsWith(".")) {
-    return (
-      <Link href={name} asChild style={style}>
-        <Pressable>{typeof children === 'function' ? (props) => children({ ...props, focused }) : children}</Pressable>
-      </Link>
-    );
-  }
+//   if (nameString.startsWith("/") || nameString.startsWith(".")) {
+//     return (
+//       <Link href={name} asChild style={style}>
+//         <Pressable>{typeof children === 'function' ? (props) => children({ ...props, focused }) : children}</Pressable>
+//       </Link>
+//     );
+//   }
 
-  return (
-    <TabbedNavigator.Link name={id} asChild style={style}>
-      <Pressable>{typeof children === 'function' ? (props) => children({ ...props, focused }) : children}</Pressable>
-    </TabbedNavigator.Link>
-  );
-}
+//   return (
+//     <TabbedNavigator.Link name={id} asChild style={style}>
+//       <Pressable>{typeof children === 'function' ? (props) => children({ ...props, focused }) : children}</Pressable>
+//     </TabbedNavigator.Link>
+//   );
+// }
 
-function SideBarTabItem({
-  children,
-  icon,
-  name,
-}: {
-  children: string;
-  icon: (props: { focused?: boolean; color: string }) => JSX.Element;
-  name: Href<string>;
-}) {
-  const isLarge = useWidth(1265);
-  const [scaleValue] = useState(new Animated.Value(1));
-  const [fontWeightAnim] = useState(new Animated.Value(400));
+// function SideBarTabItem({
+//   children,
+//   icon,
+//   name,
+// }: {
+//   children: string;
+//   icon: (props: { focused?: boolean; color: string }) => JSX.Element;
+//   name: Href<string>;
+// }) {
+//   const isLarge = useWidth(1265);
+//   const [scaleValue] = useState(new Animated.Value(1));
+//   const [fontWeightAnim] = useState(new Animated.Value(400));
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+//   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const handlePressIn = () => {
-    Animated.spring(scaleValue, {
-      toValue: 0.8,
-      useNativeDriver: true,
-    }).start();
+//   const handlePressIn = () => {
+//     Animated.spring(scaleValue, {
+//       toValue: 0.8,
+//       useNativeDriver: true,
+//     }).start();
 
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 200,
-      easing: () => Easing.cubic(0.17),
-      useNativeDriver: false,
-    }).start();
+//     Animated.timing(fadeAnim, {
+//       toValue: 1,
+//       duration: 200,
+//       easing: () => Easing.cubic(0.17),
+//       useNativeDriver: false,
+//     }).start();
 
-    Animated.timing(fontWeightAnim, {
-      toValue: 700,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
-  };
+//     Animated.timing(fontWeightAnim, {
+//       toValue: 700,
+//       duration: 200,
+//       useNativeDriver: false,
+//     }).start();
+//   };
 
-  const handlePressOut = () => {
-    Animated.spring(scaleValue, {
-      toValue: 1,
-      friction: 3,
-      tension: 40,
-      useNativeDriver: true,
-    }).start();
+//   const handlePressOut = () => {
+//     Animated.spring(scaleValue, {
+//       toValue: 1,
+//       friction: 3,
+//       tension: 40,
+//       useNativeDriver: true,
+//     }).start();
 
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 200,
-      easing: () => Easing.cubic(0.17),
-      useNativeDriver: false,
-    }).start();
+//     Animated.timing(fadeAnim, {
+//       toValue: 0,
+//       duration: 200,
+//       easing: () => Easing.cubic(0.17),
+//       useNativeDriver: false,
+//     }).start();
 
-    Animated.timing(fontWeightAnim, {
-      toValue: 400,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
-  };
+//     Animated.timing(fontWeightAnim, {
+//       toValue: 400,
+//       duration: 200,
+//       useNativeDriver: false,
+//     }).start();
+//   };
 
-  return (
-    <TabBarItem
-      name={name}
-      id={name.toString()}
-      style={{
-        paddingVertical: 4,
-        width: "100%",
-      }}
-    >
-      <TouchableWithoutFeedback onPressIn={handlePressIn} onPressOut={handlePressOut}>
-        <Animated.View
-          style={[
-            {
-              padding: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              borderRadius: 999,
-            },
-            {
-              opacity: fadeAnim,
-              backgroundColor: "rgba(0, 0, 0, 0.1)",
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }
-          ]}
-        >
-          <Animated.View
-            style={{ transform: [{ scale: scaleValue }] }}
-          >
-            {icon({
-              focused: true,
-              color: "#000",
-            })}
-          </Animated.View>
+//   return (
+//     <TabBarItem
+//       name={name}
+//       id={name.toString()}
+//       style={{
+//         paddingVertical: 4,
+//         width: "100%",
+//       }}
+//     >
+//       <TouchableWithoutFeedback onPressIn={handlePressIn} onPressOut={handlePressOut}>
+//         <Animated.View
+//           style={[
+//             {
+//               padding: 12,
+//               flexDirection: "row",
+//               alignItems: "center",
+//               borderRadius: 999,
+//             },
+//             {
+//               opacity: fadeAnim,
+//               backgroundColor: "rgba(0, 0, 0, 0.1)",
+//               shadowColor: '#000',
+//               shadowOffset: {
+//                 width: 0,
+//                 height: 2,
+//               },
+//               shadowOpacity: 0.25,
+//               shadowRadius: 3.84,
+//               elevation: 5,
+//             }
+//           ]}
+//         >
+//           <Animated.View
+//             style={{ transform: [{ scale: scaleValue }] }}
+//           >
+//             {icon({
+//               focused: true,
+//               color: "#000",
+//             })}
+//           </Animated.View>
 
-          <Animated.Text
-            style={[
-              {
-                color: "#000",
-                fontSize: 16,
-                marginLeft: 16,
-                marginRight: 16,
-                lineHeight: 24,
-                fontWeight: fontWeightAnim
-              },
-              Platform.select({
-                default: {
-                  display: isLarge ? "flex" : "none",
-                },
-                web: cns(cssStyles.sideBarTabItemText),
-              })
+//           <Animated.Text
+//             style={[
+//               {
+//                 color: "#000",
+//                 fontSize: 16,
+//                 marginLeft: 16,
+//                 marginRight: 16,
+//                 lineHeight: 24,
+//                 fontWeight: fontWeightAnim
+//               },
+//               Platform.select({
+//                 default: {
+//                   display: isLarge ? "flex" : "none",
+//                 },
+//                 web: cns(cssStyles.sideBarTabItemText),
+//               })
 
-            ]}
-          >
-            {children}
-          </Animated.Text>
-        </Animated.View>
+//             ]}
+//           >
+//             {children}
+//           </Animated.Text>
+//         </Animated.View>
 
-      </TouchableWithoutFeedback>
+//       </TouchableWithoutFeedback>
 
 
-    </TabBarItem>
-  );
-}
+//     </TabBarItem>
+//   );
+// }
 
-export function ResponsiveNavigator() {
-  const isRowLayout = useWidth(768);
+// export function ResponsiveNavigator() {
+//   const isRowLayout = useWidth(768);
 
-  return (
-    <TabbedNavigator
-      screenOptions={{
-        tabBarShowLabel: false,
-        headerShown: false,
-        tabBarActiveTintColor: "black",
-      }}
-    >
-      <View
-        style={[
-          jsStyles.flex1,
-          Platform.select({
-            default: {
-              flexDirection: isRowLayout ? "row" : "column",
-            },
-            web: cns(cssStyles.container),
-          }),
-        ]}
-      >
-        <SideBar visible={isRowLayout} />
-        <AppHeader visible={!isRowLayout} />
-        <TabbedNavigator.Slot />
-        <TabBar visible={!isRowLayout} />
-      </View>
-    </TabbedNavigator>
-  );
-}
+//   return (
+//     <TabbedNavigator
+//       screenOptions={{
+//         tabBarShowLabel: false,
+//         headerShown: false,
+//         tabBarActiveTintColor: "black",
+//       }}
+//     >
+//       <View
+//         style={[
+//           jsStyles.flex1,
+//           Platform.select({
+//             default: {
+//               flexDirection: isRowLayout ? "row" : "column",
+//             },
+//             web: cns(cssStyles.container),
+//           }),
+//         ]}
+//       >
+//         <SideBar visible={isRowLayout} />
+//         <AppHeader visible={!isRowLayout} />
+//         <TabbedNavigator.Slot />
+//         <TabBar visible={!isRowLayout} />
+//       </View>
+//     </TabbedNavigator>
+//   );
+// }
 
-function AppHeader({ visible }) {
-  const { top } = useSafeAreaInsets();
-  const height = 60 + top;
-  return (
-    <>
-      <View style={{ height }} />
-      <View
-        style={[
-          Platform.select({
-            default: !visible && {
-              display: "none",
-            },
-            web: cns(cssStyles.smallVisible),
-          }),
-          { height, paddingTop: top },
-          jsStyles.appHeader,
-        ]}
-      >
-        <Icon name="logo" fill={Colors.dark} />
-      </View>
-    </>
-  );
-}
+// function AppHeader({ visible }) {
+//   const { top } = useSafeAreaInsets();
+//   const height = 60 + top;
+//   return (
+//     <>
+//       <View style={{ height }} />
+//       <View
+//         style={[
+//           Platform.select({
+//             default: !visible && {
+//               display: "none",
+//             },
+//             web: cns(cssStyles.smallVisible),
+//           }),
+//           { height, paddingTop: top },
+//           jsStyles.appHeader,
+//         ]}
+//       >
+//         <Icon name="logo" fill={Colors.dark} />
+//       </View>
+//     </>
+//   );
+// }
 
-const Colors = {
-  lightGray: "rgba(230, 230, 230, 1)",
-  dark: "rgba(41, 41, 41, 1)",
-};
+// const Colors = {
+//   lightGray: "rgba(230, 230, 230, 1)",
+//   dark: "rgba(41, 41, 41, 1)",
+// };
 
-const NAV_MEDIUM_WIDTH = 244;
+// const NAV_MEDIUM_WIDTH = 244;
 
-const jsStyles = StyleSheet.create({
-  sideBar: {
-    minWidth: 72,
-    width: 72,
-  },
-  sidebarInner: {
-    position: Platform.select({ web: "fixed", default: "absolute" }),
-    height: "100%",
-    maxHeight: "100%",
-    alignItems: "stretch",
-    borderRightWidth: 1,
-    borderRightColor: Colors.lightGray,
-    minWidth: 72,
-    width: 72,
-    paddingTop: 8,
-    paddingHorizontal: 12,
-    paddingBottom: 20,
-  },
-  flex1: { flex: 1 },
-  appHeader: {
-    zIndex: 10,
-    backgroundColor: "white",
-    position: Platform.select({ web: "fixed", default: "absolute" }),
-    top: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.lightGray,
-  },
-  sidebarInner2: {
-    flex: 1,
-    alignItems: "stretch",
-    height: "100%",
-    justifyContent: "space-between",
-  },
-  headerLogo: {
-    margin: 0,
-    display: "flex",
-    // flex: 1,
-    alignItems: "center",
-    padding: 12,
-    marginVertical: 4,
-    borderRadius: 4,
-    transitionProperty: ["background-color", "box-shadow"],
-    transitionDuration: "200ms",
-  },
-  nav: {
-    flexDirection: "row",
-    borderTopWidth: 1,
-    borderTopColor: Colors.lightGray,
-    justifyContent: "space-around",
-    alignItems: "center",
-    height: 49,
-    paddingHorizontal: 16,
-  },
-});
+// const jsStyles = StyleSheet.create({
+//   sideBar: {
+//     minWidth: 72,
+//     width: 72,
+//   },
+//   sidebarInner: {
+//     position: Platform.select({ web: "fixed", default: "absolute" }),
+//     height: "100%",
+//     maxHeight: "100%",
+//     alignItems: "stretch",
+//     borderRightWidth: 1,
+//     borderRightColor: Colors.lightGray,
+//     minWidth: 72,
+//     width: 72,
+//     paddingTop: 8,
+//     paddingHorizontal: 12,
+//     paddingBottom: 20,
+//   },
+//   flex1: { flex: 1 },
+//   appHeader: {
+//     zIndex: 10,
+//     backgroundColor: "white",
+//     position: Platform.select({ web: "fixed", default: "absolute" }),
+//     top: 0,
+//     left: 0,
+//     right: 0,
+//     paddingHorizontal: 16,
+//     flexDirection: "row",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//     borderBottomWidth: 1,
+//     borderBottomColor: Colors.lightGray,
+//   },
+//   sidebarInner2: {
+//     flex: 1,
+//     alignItems: "stretch",
+//     height: "100%",
+//     justifyContent: "space-between",
+//   },
+//   headerLogo: {
+//     margin: 0,
+//     display: "flex",
+//     // flex: 1,
+//     alignItems: "center",
+//     padding: 12,
+//     marginVertical: 4,
+//     borderRadius: 4,
+//     transitionProperty: ["background-color", "box-shadow"],
+//     transitionDuration: "200ms",
+//   },
+//   nav: {
+//     flexDirection: "row",
+//     borderTopWidth: 1,
+//     borderTopColor: Colors.lightGray,
+//     justifyContent: "space-around",
+//     alignItems: "center",
+//     height: 49,
+//     paddingHorizontal: 16,
+//   },
+// });

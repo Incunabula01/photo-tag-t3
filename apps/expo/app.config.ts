@@ -1,9 +1,9 @@
-import { ExpoConfig, ConfigContext } from "@expo/config";
+import { ExpoConfig } from "@expo/config";
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 const EAS_APP_ID = process.env.EXPO_PUBLIC_EAS_APP_ID;
 
-const defineConfig = (_ctx: ConfigContext): ExpoConfig => ({
+const defineConfig = (): ExpoConfig => ({
   name: "photo-tag",
   slug: "photo-tag",
   version: "1.0.0",

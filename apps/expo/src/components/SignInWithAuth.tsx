@@ -1,5 +1,5 @@
 import React from "react";
-import { KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSignIn } from "@clerk/clerk-expo";
 
 export default function SignInScreen() {
@@ -7,6 +7,7 @@ export default function SignInScreen() {
 
     const [emailAddress, setEmailAddress] = React.useState("");
     const [password, setPassword] = React.useState("");
+
 
     const onSignInPress = async () => {
         if (!isLoaded) {
@@ -21,12 +22,11 @@ export default function SignInScreen() {
             // This is an important step,
             // This indicates the user is signed in
             await setActive({ session: completeSignIn.createdSessionId });
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.log(err);
         }
     };
     return (
-        // <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}>
         <View className="flex-1 justify-center items-center">
             <View className="w-full">
                 <Text className="text-3xl font-bold mb-4">Sign In</Text>
@@ -59,7 +59,6 @@ export default function SignInScreen() {
             </View>
 
         </View>
-        // </KeyboardAvoidingView>
 
     );
 }

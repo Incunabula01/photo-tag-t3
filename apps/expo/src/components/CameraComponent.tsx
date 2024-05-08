@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Camera, CameraType, FlashMode } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import IconButton from './IconButton';
 import { trpc } from '../utils/trpc';
 
@@ -121,8 +121,6 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
                     type={CameraType.back}
                     flashMode={flashMode}
                     ref={cameraRef}
-                    // style={styles.camera}
-                    // className='flex justify-between h-[80vh] w-full'
                     className='flex-1 h-[100vh] w-full justify-between'
                 >
                 </Camera> :
@@ -144,11 +142,5 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ onSavePhoto }) => {
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    camera: {
-        flex: 1,
-    }
-})
 
 export default CameraComponent;

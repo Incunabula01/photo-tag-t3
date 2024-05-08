@@ -32,7 +32,7 @@ export default function SignUpScreen() {
 
             // change the UI to our pending section.
             setPendingVerification(true);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(JSON.stringify(err, null, 2));
         }
     };
@@ -49,13 +49,12 @@ export default function SignUpScreen() {
             });
 
             await setActive({ session: completeSignUp.createdSessionId });
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(JSON.stringify(err, null, 2));
         }
     };
 
     return (
-        // <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}>
         <View className="flex-1 justify-center items-center">
             {!pendingVerification && (
                 <View className="w-full">
@@ -125,7 +124,6 @@ export default function SignUpScreen() {
                 </View>
             )}
         </View>
-        // </KeyboardAvoidingView>
 
 
     );
