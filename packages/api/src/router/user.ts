@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
-import { User } from "../../../db";
+
+type User = {
+  id: number;
+  username: string;
+  email: string;
+  hasTag: boolean;
+  capturedTags: string[];
+};
 
 export const userRouter = router({
   addUser: protectedProcedure
