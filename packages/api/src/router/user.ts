@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
+import { User } from "../../../db";
 
 export const userRouter = router({
   addUser: protectedProcedure
@@ -17,7 +18,9 @@ export const userRouter = router({
           .findUnique({
             where: { email },
           })
-          .then((res) => (res?.username !== undefined ? true : false));
+          .then((res: User | null) =>
+            res?.username !== undefined ? true : false,
+          );
 
         const existingPosts = await ctx.prisma.post.findMany();
 
@@ -55,13 +58,13 @@ export const userRouter = router({
           .findUnique({
             where: { username: prevName },
           })
-          .then((res) => res?.username);
+          .then((res: User | null) => res?.username);
 
         const user2 = await ctx.prisma.user
           .findUnique({
             where: { username: nextName },
           })
-          .then((res) => res?.username);
+          .then((res: User | null) => res?.username);
 
         const updateUser1 = await ctx.prisma.user.update({
           where: {
