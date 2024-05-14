@@ -163,8 +163,8 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(postcss@8.4.20)
       typescript:
-        specifier: ^5.3.3
-        version: 5.3.3
+        specifier: ^4.9.3
+        version: 4.9.4
 
   apps/nextjs:
     dependencies:
@@ -212,8 +212,8 @@ importers:
         specifier: ^18.0.0
         version: 18.11.13
       '@types/react':
-        specifier: ^18.0.25
-        version: 18.0.26
+        specifier: ^18.0.38
+        version: 18.2.48
       '@types/react-dom':
         specifier: ^18.0.9
         version: 18.0.9
@@ -4150,29 +4150,13 @@ packages:
   /@types/react-dom@18.0.9:
     resolution: {integrity: sha512-qnVvHxASt/H7i+XG1U1xMiY5t+IHcPGUK7TDMDzom08xa7e86eCeKOiLZezwCKVxJn6NEiiy2ekgX8aQssjIKg==}
     dependencies:
-      '@types/react': 18.0.38
+      '@types/react': 18.2.48
     dev: true
 
   /@types/react-native@0.70.19:
     resolution: {integrity: sha512-c6WbyCgWTBgKKMESj/8b4w+zWcZSsCforson7UdXtXMecG3MxCinYi6ihhrHVPyUrVzORsvEzK8zg32z4pK6Sg==}
     dependencies:
       '@types/react': 18.2.48
-    dev: true
-
-  /@types/react@18.0.26:
-    resolution: {integrity: sha512-hCR3PJQsAIXyxhTNSiDFY//LhnMZWpNNr5etoCqx/iUfGc5gXWtQR2Phl908jVR6uPXacojQWTg4qRpkxTuGug==}
-    dependencies:
-      '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.2
-      csstype: 3.1.1
-    dev: true
-
-  /@types/react@18.0.38:
-    resolution: {integrity: sha512-ExsidLLSzYj4cvaQjGnQCk4HFfVT9+EZ9XZsQ8Hsrcn8QNgXtpZ3m9vSIC2MWtx7jHictK6wYhQgGh6ic58oOw==}
-    dependencies:
-      '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.2
-      csstype: 3.1.1
     dev: true
 
   /@types/react@18.2.48:
@@ -11735,12 +11719,6 @@ packages:
     resolution: {integrity: sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==}
     engines: {node: '>=4.2.0'}
     hasBin: true
-
-  /typescript@5.3.3:
-    resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-    dev: true
 
   /ua-parser-js@0.7.32:
     resolution: {integrity: sha512-f9BESNVhzlhEFf2CHMSj40NWOjYPl1YKYbrvIr/hFTDEmLq7SRbWvm7FcdcpCYT95zrOhC7gZSxjdnnTpBcwVw==}
