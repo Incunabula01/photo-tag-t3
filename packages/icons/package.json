@@ -1,8 +1,9 @@
 {
-  "name": "icons",
+  "name": "@photo-tag/icons",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

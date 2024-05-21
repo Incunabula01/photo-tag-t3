@@ -9,7 +9,12 @@
 const config = {
   reactStrictMode: true,
   swcMinify: true,
-  transpilePackages: ["@photo-tag/api", "@photo-tag/db"],
+  transpilePackages: [
+    "@photo-tag/api",
+    "@photo-tag/db",
+    "@photo-tag/icons",
+    "@photo-tag/server",
+  ],
   // We already do linting on GH actions
   eslint: {
     ignoreDuringBuilds: !!process.env.CI,

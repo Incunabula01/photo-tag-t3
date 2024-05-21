@@ -1,9 +1,8 @@
 import React from "react";
 
-// const icons = require.context("../../assets/icons");
-const icons = require("../../assets/icons");
+const icons = require("./assets");
 
-export type IconName =
+type IconName =
     | "logo"
     | "logo-small"
     | "more"
@@ -15,7 +14,7 @@ export type IconName =
     | "messages"
     | "notifications";
 
-export function Icon({
+const Icon = ({
     name,
     ...props
 }: {
@@ -24,7 +23,7 @@ export function Icon({
     style?: any;
     width?: number;
     height?: number;
-}) {
+}) => {
     const IconComponent = React.useMemo(() => {
         const importIcons = icons(`./${name}.svg`);
         if (!importIcons) {
@@ -36,3 +35,5 @@ export function Icon({
     }, [name]);
     return <IconComponent {...props} color={props.fill} />;
 }
+
+export default Icon;

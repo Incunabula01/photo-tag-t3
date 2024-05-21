@@ -3,11 +3,12 @@ import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TRPCProvider } from "../utils/trpc";
 
-import { HomeScreen } from "../screens/home";
 import { SignInSignUpScreen } from "../screens/signin";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
 import { tokenCache } from "../utils/cache";
 import Constants from "expo-constants";
+import Layout from "./_layout";
+import { ModalProvider } from "../components/ModalProvider";
 
 export const App = () => {
 
@@ -19,8 +20,10 @@ export const App = () => {
       <SignedIn>
         <TRPCProvider>
           <SafeAreaProvider>
-            <HomeScreen />
-            <StatusBar />
+            <ModalProvider >
+              <Layout />
+              <StatusBar />
+            </ModalProvider>
           </SafeAreaProvider>
         </TRPCProvider>
       </SignedIn>

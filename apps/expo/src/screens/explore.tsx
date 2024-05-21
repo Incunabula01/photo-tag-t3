@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Page() {
+export default function ExploreScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>

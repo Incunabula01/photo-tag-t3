@@ -12,27 +12,13 @@ import uuid from 'react-native-uuid';
 import { trpc } from "../utils/trpc";
 import CameraComponent from "../components/CameraComponent";
 import { Post, User } from "../../../../packages/db";
-import Modal from "../components/Modal";
-import { ModalProvider, useModal } from "../components/ModalProvider";
+
+import { useModal } from "../components/ModalProvider";
 import IconButton from "../components/IconButton";
 import FullScreenLoader from "../components/Loading";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUserStore, useAppStore } from "../store/GlobalStore";
 
-
-const SignOut = () => {
-  const { signOut } = useAuth();
-  return (
-    <View className="rounded-lg border-2 border-gray-500 p-4">
-      <Button
-        title="Sign Out"
-        onPress={() => {
-          signOut();
-        }}
-      />
-    </View>
-  );
-};
 
 const PostCard: React.FC<{
   post: inferProcedureOutput<AppRouter["post"]["all"]>[number];
@@ -40,8 +26,8 @@ const PostCard: React.FC<{
   console.log('Post Card Rendered!');
 
   return (
-    <View className="rounded-lg border-2 border-gray-500 p-4">
-      <View className="h-[20vh]">
+    <View className="p-2">
+      <View className="h-[50vh]">
         <Image source={{ uri: post.imageUrl }} className="flex-1" />
       </View>
       <Text className="text-xl font-semibold text-[#cc66ff]">{post.title}</Text>
@@ -360,56 +346,56 @@ export const HomeScreen = () => {
 
   return (
     <SafeAreaView className="bg-white" style={styles.container}>
-      <ModalProvider >
-        <View className="h-full w-full p-2" style={styles.main}>
-          <Text className="mx-auto pb-2 text-5xl font-bold text-gray-500">
+
+      <View className="h-full w-full p-2" style={styles.main}>
+        {/* <Text className="mx-auto pb-2 text-5xl font-bold text-gray-500">
             Photo Tag
-          </Text>
+          </Text> */}
 
-          {data && data.length > 0 &&
+        {data && data.length > 0 &&
 
-            <>
-              <PostCard post={data[0] as Post} />
-              <View className="py-2">
-                {(!currentUser.hasTag && status === 'placed') &&
-                  <TouchableOpacity
-                    className="rounded bg-green-500 p-4"
-                    onPress={handleCapture}
-                  >
-                    <Text className="font-semibold text-white text-center">Capture Tag!</Text>
-                  </TouchableOpacity>
-                }
-                {currentUser.hasTag && status === 'pending' &&
-                  <TouchableOpacity
-                    className="rounded bg-green-500 p-4"
-                    onPress={handleCapture}
-                  >
-                    <Text className="font-semibold text-white text-center">Place New Tag!</Text>
-                  </TouchableOpacity>
-                }
-              </View>
-            </>
-          }
-
-          {data && data.length === 0 &&
-            <>
-              <Text className="font-semibold italic text-gray-500">
-                No Posts Yet, create some!
-              </Text>
-              <View className="py-2">
+          <>
+            <PostCard post={data[0] as Post} />
+            <View className="py-2">
+              {(!currentUser.hasTag && status === 'placed') &&
                 <TouchableOpacity
                   className="rounded bg-green-500 p-4"
                   onPress={handleCapture}
                 >
-                  <Text className="font-semibold text-white text-center">Create New Tag!</Text>
+                  <Text className="font-semibold text-white text-center">Capture Tag!</Text>
                 </TouchableOpacity>
-              </View>
-            </>
-          }
+              }
+              {currentUser.hasTag && status === 'pending' &&
+                <TouchableOpacity
+                  className="rounded bg-green-500 p-4"
+                  onPress={handleCapture}
+                >
+                  <Text className="font-semibold text-white text-center">Place New Tag!</Text>
+                </TouchableOpacity>
+              }
+            </View>
+          </>
+        }
 
-          <SignOut />
-        </View>
-      </ModalProvider>
+        {data && data.length === 0 &&
+          <>
+            <Text className="font-semibold italic text-gray-500">
+              No Posts Yet, create some!
+            </Text>
+            <View className="py-2">
+              <TouchableOpacity
+                className="rounded bg-green-500 p-4"
+                onPress={handleCapture}
+              >
+                <Text className="font-semibold text-white text-center">Create New Tag!</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        }
+
+
+      </View>
+
 
     </SafeAreaView>
   );
@@ -436,6 +422,8 @@ const styles = StyleSheet.create({
     color: "#38434D",
   },
 });
+
+
 
 
 
