@@ -1,12 +1,34 @@
-import { StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { StyleSheet, View, Text } from "react-native";
+import PostCard from "../components/PostCard";
+import FullScreenLoader from "../components/Loading";
+import { trpc } from "../utils/trpc";
 
-export default function ExploreScreen() {
+
+export const ExploreScreen = () => {
+  const { data, isLoading } = trpc.post.all.useQuery();
+  const [showPost, setShowPost] = useState<string | undefined>();
+
+  if (isLoading) {
+    return <FullScreenLoader />
+  }
+
   return (
     <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>Explore</Text>
-        <Text style={styles.subtitle}>Modify app/explore.tsx</Text>
+      {/* <View style={styles.main}> */}
+      <View className="container">
+        <View className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+          {data ?
+            data.map((postData) => (
+              <View key={postData.postId}>
+                <PostCard post={postData} />
+              </View>
+            )) :
+            <Text style={styles.subtitle}>No Tags Available!</Text>
+          }
+        </View>
       </View>
+      {/* </View> */}
     </View>
   );
 }
@@ -19,7 +41,7 @@ const styles = StyleSheet.create({
   },
   main: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     maxWidth: 960,
     marginHorizontal: "auto",
   },

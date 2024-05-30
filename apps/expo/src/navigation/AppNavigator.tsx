@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { HomeScreen } from '../screens/home';
-import ExploreScreen from '../screens/explore';
+import { ExploreScreen } from '../screens/explore';
 import ProfileScreen from '../screens/profile';
 
 import { Ionicons } from '@expo/vector-icons';

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Button, Text, TextInput, TouchableOpacity, View, StyleSheet, Image, Alert, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform } from "react-native";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FlashList } from "@shopify/flash-list";
 import type { inferProcedureOutput } from "@trpc/server";
 import type { AppRouter } from "@photo-tag/api";
 import * as Location from "expo-location";
@@ -18,24 +17,10 @@ import IconButton from "../components/IconButton";
 import FullScreenLoader from "../components/Loading";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUserStore, useAppStore } from "../store/GlobalStore";
+import PostCard from "../components/PostCard";
 
 
-const PostCard: React.FC<{
-  post: inferProcedureOutput<AppRouter["post"]["all"]>[number];
-}> = ({ post }) => {
-  console.log('Post Card Rendered!');
 
-  return (
-    <View className="p-2">
-      <View className="h-[50vh]">
-        <Image source={{ uri: post.imageUrl }} className="flex-1" />
-      </View>
-      <Text className="text-xl font-semibold text-[#cc66ff]">{post.title}</Text>
-      <Text className="text-xl text-[#cc66ff]">{post.userId}</Text>
-      <Text className="text-gray-500">{post.content}</Text>
-    </View>
-  );
-};
 
 interface CreatePostProps {
   userId: string | undefined;
@@ -180,13 +165,11 @@ const CreatePost = ({
 };
 
 export const HomeScreen = () => {
-  // const postQuery = trpc.post.all.useQuery();
   const { openModal, closeModal } = useModal();
   const { currentUser, setCurrentUser } = useUserStore();
   const { status, setStatus } = useAppStore();
   const utils = trpc.useContext();
   const { data, refetch } = trpc.post.mostRecent.useQuery();
-  // const [showPost, setShowPost] = useState<string | undefined>();
   const { isSignedIn, user } = useUser();
 
 
